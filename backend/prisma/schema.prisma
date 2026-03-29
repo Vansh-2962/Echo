@@ -1,0 +1,197 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  collections   Collections[]
+  requests      Requests[]
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Collections {
+  id          Int        @id      @default(autoincrement())
+  name        String     
+  requests    Requests[]
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Requests {
+  id          Int      @id  @default(autoincrement())
+  method      String
+  url         String
+  name        String
+
+  params      KeyValue[] @relation("RequestParams")
+  headers     KeyValue[] @relation("HeadersParams")
+
+  bodyType    BodyType
+  rawBody     Json?        // for JSON, XML, raw text
+  bodyFields  BodyField[]  // for form-data / urlencoded
+
+  authType    AuthType
+  auth        Auth?        // flexible auth storage
+
+  scripts     String?
+
+  response    Response[]
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  collectionId Int
+  collection   Collections @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BodyType {
+  NONE
+  JSON
+  FORMDATA
+  URLENCODED
+  RAW
+}
+
+enum AuthType {
+  NONE
+  BEARER
+  BASIC
+  API_KEY
+  OAUTH2
+}
+
+model Auth {
+  id        Int      @id @default(autoincrement())
+  type      AuthType
+
+  token     String?
+  username  String?
+  password  String?
+
+  key       String?
+  value     String?
+  addTo     String? // header/query
+
+  requestId Int     @unique
+  request   Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model BodyField {
+  id        Int    @id @default(autoincrement())
+  key       String
+  value     String?
+  type      String   // text | file
+  description String?
+  enabled   Boolean @default(true)
+
+  requestId Int
+  request   Requests @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model KeyValue {
+  id          Int     @id @default(autoincrement())
+  key         String
+  value       String?
+  description String?
+  enabled     Boolean @default(true)
+
+  paramsRequestId   Int?
+  paramsRequest     Requests? @relation("RequestParams",fields: [paramsRequestId], references: [id], onDelete: Cascade)
+
+  headersRequestId   Int?
+  headersRequest     Requests? @relation("HeadersParams",fields: [headersRequestId], references: [id], onDelete: Cascade)
+
+  type        String   // "param" | "header"
+}
+
+model Response {
+  id          Int           @id           @default(autoincrement())
+  requestId   Int
+  request     Requests   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  statusCode  Int
+  responseTime  Int
+  size        Int
+
+
+  timeline    Json
+  breakdown   Json
+  headers     Json
+
+  body       Json
+  cookies    Json?
+
+  createdAt  DateTime       @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
