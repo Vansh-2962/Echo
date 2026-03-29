@@ -323,8 +323,34 @@ export async function saveRequest(req: Request, res: Response) {
         collectionId: id as number,
       },
     });
-    
+
     return res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteRequest(req: Request, res: Response) {
+  try {
+    const collid = +req.params.collid!;
+    const rid = +req.params.rid!;
+
+    const request = await prisma.requests.delete({
+      where: {
+        id: rid,
+        collectionId: collid,
+      },
+    });
+
+    if (request.id) {
+      return res.status(200).json({ success: true, msg: "Deleted" });
+    }
+    return res
+      .status(400)
+      .json({ success: false, msg: "Failed to delete! Request not found" });
   } catch (error) {
     console.log(error);
     return res
