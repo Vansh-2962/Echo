@@ -266,62 +266,90 @@ export async function saveRequest(req: Request, res: Response) {
         .json({ success: false, msg: "Collection not found" });
     }
 
-    const request = await prisma.requests.create({
-      data: {
-        name: data.name,
-        method,
-        url,
-        params: {
-          create: params
-            .filter((p: any) => p.key && p.key.trim() !== "" && p.enabled)
-            .map((p: any) => ({
-              key: p.key,
-              value: p.value,
-              description: p.description,
-              enabled: p.enabled,
-              type: "params",
-            })),
-        },
-        headers: {
-          create: headers
-            .filter((h: any) => h.key && h.key.trim() !== "" && h.enabled)
-            .map((h: any) => ({
-              key: h.key,
-              value: h.value,
-              description: h.description,
-              enabled: h.enabled,
-              type: "headers",
-            })),
-        },
-        bodyType: bType as BodyType,
-        rawBody: bodyContent,
-        bodyFields: {
-          create: bodyFormData
-            .filter((bd: any) => bd.key && bd.key.trim() !== "" && bd.enabled)
-            .map((bd: any) => ({
-              key: bd.key,
-              value: bd.value,
-              description: bd.description,
-              enabled: bd.enabled,
-              type: "text",
-            })),
-        },
-        authType: aType as AuthType,
-        auth: {
-          create: {
-            token: authConfig.token,
-            type: aType as AuthType,
-            username: authConfig.username,
-            password: authConfig.password,
-            key: authConfig.keyName,
-            value: authConfig.keyValue,
-            addTo: authConfig.addTo || "headers",
+    const result = await prisma.$transaction(async (tx) => {
+      const request = await tx.requests.create({
+        data: {
+          name: data.name,
+          method,
+          url,
+
+          params: {
+            create: params
+              .filter((p: any) => p.key && p.key.trim() !== "" && p.enabled)
+              .map((p: any) => ({
+                key: p.key,
+                value: p.value,
+                description: p.description,
+                enabled: p.enabled,
+                type: "params",
+              })),
           },
+
+          headers: {
+            create: headers
+              .filter((h: any) => h.key && h.key.trim() !== "" && h.enabled)
+              .map((h: any) => ({
+                key: h.key,
+                value: h.value,
+                description: h.description,
+                enabled: h.enabled,
+                type: "headers",
+              })),
+          },
+
+          bodyType: bType as BodyType,
+          rawBody: bodyContent,
+
+          bodyFields: {
+            create: bodyFormData
+              .filter((bd: any) => bd.key && bd.key.trim() !== "" && bd.enabled)
+              .map((bd: any) => ({
+                key: bd.key,
+                value: bd.value,
+                description: bd.description,
+                enabled: bd.enabled,
+                type: "text",
+              })),
+          },
+
+          authType: aType as AuthType,
+          auth: {
+            create: {
+              token: authConfig.token,
+              type: aType as AuthType,
+              username: authConfig.username,
+              password: authConfig.password,
+              key: authConfig.keyName,
+              value: authConfig.keyValue,
+              addTo: authConfig.addTo || "headers",
+            },
+          },
+
+          scripts: `${preRequestScript}-${postResponseScript}`,
+          userId: user?.id,
+          collectionId: id as number,
         },
-        scripts: `${preRequestScript}-${postResponseScript}`,
-        userId: user?.id,
-        collectionId: id as number,
-      },
+      });
+
+      // 👉 Conditionally create response
+      if (data.request?.response) {
+        await tx.response.create({
+          data: {
+            requestId: request.id,
+            statusCode: data.request.response.response.status,
+            statusText: data.request.response.response.statusText,
+            responseTime: data.request.response.response.time.total,
+            size: data.request.response.response.size.raw,
+            timeline: data.request.response.response.time,
+            breakdown: data.request.response.response.size.breakdown,
+            headers: data.request.response.response.headers,
+            body: data.request.response.response.body,
+            cookies: data.request.response.response.cookies,
+          },
+        });
+      }
+
+      return request;
     });
 
     return res.status(200).json({ success: true, data });
@@ -351,6 +379,30 @@ export async function deleteRequest(req: Request, res: Response) {
     return res
       .status(400)
       .json({ success: false, msg: "Failed to delete! Request not found" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteCollection(req: Request, res: Response) {
+  try {
+    const collid = +req.params.id!;
+
+    const collection = await prisma.collections.delete({
+      where: {
+        id: collid,
+      },
+    });
+
+    if (collection.id) {
+      return res.status(200).json({ success: true, msg: "Deleted" });
+    }
+    return res
+      .status(400)
+      .json({ success: false, msg: "Failed to delete! Collection not found" });
   } catch (error) {
     console.log(error);
     return res

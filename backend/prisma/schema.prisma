@@ -180,6 +180,7 @@ model Response {
   request     Requests   @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   statusCode  Int
+  statusText  String
   responseTime  Int
   size        Int
 
