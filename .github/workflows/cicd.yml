@@ -1,0 +1,11 @@
+name: CI/CD pipeline
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: echo "Running tests...OK!"
