@@ -71,11 +71,15 @@ export async function getAllCollections(req: Request, res: Response) {
       },
       include: {
         requests: {
+          orderBy: {
+            createdAt: "desc",
+          },
           include: {
             params: true,
             headers: true,
             bodyFields: true,
             auth: true,
+            response: true,
           },
         },
       },
@@ -110,18 +114,22 @@ export async function createRequest(req: Request, res: Response) {
     if (Array.isArray(headers) && headers.length > 0) {
       headers.forEach((h: any) => {
         if (h.enabled && h.key) {
-          queryParams[h.key] = h.value;
+          cleanHeaders[h.key] = h.value;
         }
       });
     }
 
     let requestBody = undefined;
+
     if (method !== "get" && method !== "head") {
-      if (authType === "json") {
+      if (data.bodyContent) {
         try {
           requestBody = JSON.parse(data.bodyContent);
+          cleanHeaders["Content-Type"] = "application/json";
         } catch (error) {
-          return res.status(400).json({ msg: "Invalid JSON body" });
+          return res.status(400).json({
+            msg: "Invalid JSON: remove trailing commas or fix syntax",
+          });
         }
       }
 
@@ -133,6 +141,15 @@ export async function createRequest(req: Request, res: Response) {
           }
         });
       }
+    }
+
+    if (
+      !requestBody &&
+      data.bodyContent &&
+      method !== "get" &&
+      method !== "head"
+    ) {
+      requestBody = data.bodyContent;
     }
 
     if (authType === "bearer" && data.authConfig?.token) {
@@ -164,19 +181,28 @@ export async function createRequest(req: Request, res: Response) {
       }
     }
 
-    const start = process.hrtime.bigint();
     const apiResponse = await got(url, {
       method: method.toUpperCase() as Method,
       searchParams: queryParams,
       headers: cleanHeaders,
-      json: requestBody,
+      ...(typeof requestBody === "object"
+        ? { json: requestBody }
+        : { body: requestBody }),
       throwHttpErrors: false,
       responseType: "json",
     });
-    const end = process.hrtime.bigint();
 
-    // total time
-    const time = Number(end - start) / 1_000_000;
+    if (apiResponse.body) {
+      // make an entry in history
+      await prisma.history.create({
+        data: {
+          method: methods[data.method] as Method,
+          url: data.url,
+          time: new Date().toISOString(),
+          userId: req.user?.id,
+        },
+      });
+    }
 
     // response size
     const headersSize = Buffer.byteLength(JSON.stringify(apiResponse.headers));
@@ -339,7 +365,7 @@ export async function saveRequest(req: Request, res: Response) {
             statusCode: data.request.response.response.status,
             statusText: data.request.response.response.statusText,
             responseTime: data.request.response.response.time.total,
-            size: data.request.response.response.size.raw,
+            size: data.request.response.response.size.formatted,
             timeline: data.request.response.response.time,
             breakdown: data.request.response.response.size.breakdown,
             headers: data.request.response.response.headers,
@@ -405,6 +431,77 @@ export async function deleteCollection(req: Request, res: Response) {
       .json({ success: false, msg: "Failed to delete! Collection not found" });
   } catch (error) {
     console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function renameRequest(req: Request, res: Response) {
+  try {
+    const { name } = req.body;
+    const id = +req.params.id!;
+
+    const request = await prisma.requests.update({
+      where: {
+        id,
+      },
+      data: {
+        name: name,
+      },
+    });
+
+    if (request) {
+      return res.status(200).json({ success: true, msg: "Renamed" });
+    }
+
+    return res.status(400).json({ success: false, msg: "Failed to rename" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function getHistory(req: Request, res: Response) {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const histories = await prisma.history.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    return res.status(200).json(histories);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteHistory(req: Request, res: Response) {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const response = await prisma.history.deleteMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    if (response) {
+      return res.status(200).json({ success: true, msg: "Deleted" });
+    }
+    return res
+      .status(400)
+      .json({ success: false, msg: "Failed to delete history" });
+  } catch (error) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

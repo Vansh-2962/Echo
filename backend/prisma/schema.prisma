@@ -20,6 +20,7 @@ model User {
   image         String?
   collections   Collections[]
   requests      Requests[]
+  history       History[]
   createdAt     DateTime
   updatedAt     DateTime
   sessions      Session[]
@@ -110,6 +111,7 @@ model Requests {
   collectionId Int
   collection   Collections @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -182,7 +184,7 @@ model Response {
   statusCode  Int
   statusText  String
   responseTime  Int
-  size        Int
+  size        String
 
 
   timeline    Json
@@ -196,3 +198,11 @@ model Response {
   updatedAt   DateTime      @updatedAt
 }
 
+model History {
+  id            Int           @id               @default(autoincrement())  
+  method        String
+  url           String
+  time          DateTime
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

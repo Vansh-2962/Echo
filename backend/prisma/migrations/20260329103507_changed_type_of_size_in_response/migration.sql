@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Response" ALTER COLUMN "size" SET DATA TYPE TEXT;
