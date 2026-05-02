@@ -7,7 +7,7 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 app.use(cors({
-    origin: "http://localhost:8080",
+    origin: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
     credentials: true,
 }));
 const PORT = 3000;
