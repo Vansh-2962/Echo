@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+pre[class*="language-"],
+code[class*="language-"] {
+  background: #f7f7f7 !important;
+}
+
+.dark pre[class*="language-"],
+.dark code[class*="language-"] {
+  background: #121216 !important;
+}
+.monaco-editor,
+.monaco-editor .overflow-guard,
+.monaco-editor-background,
+.monaco-editor .margin {
+  background: transparent !important;
+}
+
+.monaco-editor .line-numbers {
+  color: rgba(148, 163, 184, 0.6); /* subtle gray */
+}
+.monaco-editor .margin {
+  border-right: none !important;
+}
+
+@keyframes draw {
+  0% {
+    stroke-dasharray: 0, 100;
+  }
+  100% {
+    stroke-dasharray: 100, 0;
+  }
+}
+
+.animate-draw path:last-child {
+  stroke-dasharray: 100;
+  animation: draw 1.2s linear infinite;
+}
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 5.5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5.5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 24 52% 65%;
+    --primary-foreground: 24 30% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 5.9% 10%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 24 52% 65%;
+    --radius: 0.375rem;
+    --sidebar-background: 240 10% 6%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 24 52% 65%;
+    --sidebar-primary-foreground: 24 30% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 24 52% 65%;
+
+    --surface: 240 10% 8%;
+    --surface-raised: 240 10% 10%;
+    --method-get: 142 71% 45%;
+    --method-post: 217 91% 60%;
+    --method-put: 38 92% 50%;
+    --method-delete: 0 84% 60%;
+    --method-patch: 270 76% 60%;
+    --method-head: 240 5% 50%;
+    --method-options: 240 5% 50%;
+    --status-2xx: 142 71% 45%;
+    --status-3xx: 217 91% 60%;
+    --status-4xx: 38 92% 50%;
+    --status-5xx: 0 84% 60%;
+
+    --primary-glow: 24 60% 72%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 98%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 24 52% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 24 52% 50%;
+    --sidebar-background: 240 4.8% 95.9%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 24 52% 50%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-ring: 24 52% 50%;
+    --surface: 0 0% 97%;
+    --surface-raised: 0 0% 100%;
+
+    --primary-glow: 24 60% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-family: "JetBrains Mono", monospace;
+  }
+  .font-sans {
+    font-family: "Inter", sans-serif;
+  }
+}
