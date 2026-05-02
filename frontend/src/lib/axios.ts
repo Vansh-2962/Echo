@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://echo-production-0d01.up.railway.app",
   withCredentials: true,
 });
