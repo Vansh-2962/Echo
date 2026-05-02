@@ -16,7 +16,7 @@ const LoginPage = () => {
     setIsLoading(true);
     const data = await authClient.signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:8080/app",
+      callbackURL: "https://echo-18zg.onrender.com/app",
     });
     setIsLoading(false);
   };
@@ -24,7 +24,7 @@ const LoginPage = () => {
   const handleSignInViaGithub = async () => {
     const data = await authClient.signIn.social({
       provider: "github",
-      callbackURL: "http://localhost:8080/app",
+      callbackURL: "https://echo-18zg.onrender.com/app",
     });
   };
 
