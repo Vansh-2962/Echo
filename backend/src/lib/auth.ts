@@ -6,7 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma.js";
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: "https://echo-production-0d01.up.railway.app",
 
   trustedOrigins: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
 
