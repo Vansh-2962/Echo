@@ -17,6 +17,9 @@ const LoginPage = () => {
     const data = await authClient.signIn.social({
       provider: "google",
       callbackURL: "https://echo-18zg.onrender.com/app",
+      fetchOptions: {
+        baseURL: "https://echo-production-0d01.up.railway.app/api/auth",
+      },
     });
     setIsLoading(false);
   };
@@ -25,6 +28,9 @@ const LoginPage = () => {
     const data = await authClient.signIn.social({
       provider: "github",
       callbackURL: "https://echo-18zg.onrender.com/app",
+      fetchOptions: {
+        baseURL: "https://echo-production-0d01.up.railway.app/api/auth",
+      },
     });
   };
 
