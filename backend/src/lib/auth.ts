@@ -8,18 +8,20 @@ import { prisma } from "./prisma.js";
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
 
-  trustedOrigins: ["http://localhost:8080", "https://echo-fwq4.onrender.com"],
+  trustedOrigins: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
 
   advanced: {
-    crossSubdomainCookies: {
-      enabled: false,
-    },
     defaultCookieAttributes: {
       secure: true,
       httpOnly: true,
       sameSite: "none",
       partitioned: true,
     },
+  },
+
+  useSecureCookies: true,
+  crossSubdomainCookies: {
+    enabled: false,
   },
 
   database: prismaAdapter(prisma, {
