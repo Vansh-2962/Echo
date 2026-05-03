@@ -6,8 +6,9 @@ import proxyRoutes from "./routes/proxyRoutes.js";
 import cors from "cors";
 dotenv.config();
 const app = express();
+app.set("trust proxy", 1);
 app.use(cors({
-    origin: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
+    origin: ["http://localhost:8080", "https://echo-fwq4.onrender.com"],
     credentials: true,
 }));
 const PORT = 3000;
