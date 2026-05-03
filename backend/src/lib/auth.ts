@@ -6,7 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma.js";
 
 export const auth = betterAuth({
-  baseURL: "https://echo-production-0d01.up.railway.app",
+  baseURL: process.env.BETTER_AUTH_URL,
 
   trustedOrigins: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
 
@@ -20,7 +20,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  
+
   databaseHooks: {
     user: {
       create: {
