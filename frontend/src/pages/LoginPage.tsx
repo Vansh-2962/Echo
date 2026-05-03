@@ -16,7 +16,7 @@ const LoginPage = () => {
     setIsLoading(true);
     const data = await authClient.signIn.social({
       provider: "google",
-      callbackURL: import.meta.env.VITE_CALLBACK_URL,
+      callbackURL: `${import.meta.env.VITE_CALLBACK_URL}/app`,
     });
     setIsLoading(false);
   };
@@ -24,7 +24,7 @@ const LoginPage = () => {
   const handleSignInViaGithub = async () => {
     const data = await authClient.signIn.social({
       provider: "github",
-      callbackURL: import.meta.env.VITE_CALLBACK_URL,
+      callbackURL: `${import.meta.env.VITE_CALLBACK_URL}/app`,
     });
   };
 
