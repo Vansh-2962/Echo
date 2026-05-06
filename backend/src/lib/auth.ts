@@ -6,9 +6,9 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma.js";
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: `${process.env.BETTER_AUTH_URL}/api/auth`,
 
-  trustedOrigins: ["http://localhost:8080", "https://echo-18zg.onrender.com"],
+  trustedOrigins: ["http://localhost:8080", "https://echo-fwq4.onrender.com"],
 
   advanced: {
     defaultCookieAttributes: {
