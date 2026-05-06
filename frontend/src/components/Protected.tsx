@@ -1,13 +1,21 @@
 import { authClient } from "@/lib/auth-client";
-import { LoaderCircle } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const Protected = ({ children }: { children: React.ReactNode }) => {
   const { data, isPending } = authClient.useSession();
+  const [checked, setChecked] = useState(false);
+
   const isAuthenticated = data?.session && data?.user;
 
-  if (isPending) {
+  useEffect(() => {
+    if (!isPending) {
+      const timer = setTimeout(() => setChecked(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isPending]);
+
+  if (isPending || !checked) {
     return (
       <div className="h-screen w-full grid place-items-center">
         <div className="flex items-center gap-2">
@@ -31,7 +39,7 @@ const Protected = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return isAuthenticated ? children : <Navigate to={"/"} />;
+  return isAuthenticated ? children : <Navigate to={"/"} replace />;
 };
 
 export default Protected;

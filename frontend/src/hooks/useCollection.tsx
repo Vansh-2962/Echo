@@ -40,14 +40,12 @@ export function useCollection() {
     mutationFn: async (id: string) => {
       const tab = tabs.find((t) => t.id === id);
       const res = await axiosInstance.post("/api/v1/proxy", tab);
-      console.log(res.data);
       if (res.data?.success) {
         sendRequest(id, res.data?.result);
       }
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data);
       client.invalidateQueries({ queryKey: ["histories"] });
     },
     onError: (err) => {
