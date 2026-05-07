@@ -17,7 +17,7 @@ import {
 import { useRequestStore } from "@/store/use-request-store";
 import { useState } from "react";
 import { EnvironmentModal } from "./EnvironmentModal";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { authClient } from "@/lib/auth-client";
 import { calculateCredits } from "@/utils/credits";
@@ -37,7 +37,6 @@ export const Navbar = () => {
   const location = useLocation();
 
   const credits = calculateCredits("FREE");
-  
 
   return (
     <>
@@ -56,7 +55,7 @@ export const Navbar = () => {
             )}
           </Button>
 
-          <div className="flex items-center gap-2">
+          <Link to={"/"} className="flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
@@ -73,7 +72,7 @@ export const Navbar = () => {
               <path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" />
             </svg>
             <span className="font-semibold text-sm tracking-tight">Echo</span>
-          </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2">
@@ -81,7 +80,7 @@ export const Navbar = () => {
             <Zap size={14} /> {credits} credits
           </p>
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className="h-8 text-xs text-muted-foreground gap-1.5"
@@ -106,7 +105,7 @@ export const Navbar = () => {
                 ))}
               </SelectContent>
             </Select>
-          </Button>
+          </Button> */}
 
           <ThemeToggle />
 

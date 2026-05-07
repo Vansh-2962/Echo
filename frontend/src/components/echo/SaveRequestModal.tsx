@@ -19,6 +19,7 @@ import {
 import { useRequestStore } from "@/store/use-request-store";
 import { useCollection } from "@/hooks/useCollection";
 import { toast } from "@/hooks/use-toast";
+import { LoaderCircle } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -109,8 +110,18 @@ export const SaveRequestModal = ({ open, onOpenChange, tabId }: Props) => {
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} className="text-xs">
-            Save
+          <Button
+            disabled={saveRequestInColllection.isPending}
+            onClick={handleSave}
+            className="text-xs"
+          >
+            {saveRequestInColllection.isPending ? (
+              <>
+                <LoaderCircle className="animate-spin" /> <p>Saving...</p>
+              </>
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

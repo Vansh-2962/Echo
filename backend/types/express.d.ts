@@ -3,7 +3,10 @@ import { Session, User } from "better-auth"; // adjust if needed
 declare global {
   namespace Express {
     interface Request {
-      user?: User;
+      user?: User & {
+        plan?: string;
+        planId?: number;
+      };
       session?: Session;
     }
   }

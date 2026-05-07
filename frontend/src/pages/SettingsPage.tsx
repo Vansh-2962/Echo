@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useTheme } from "next-themes";
 
 const sections = [
   "profile",
@@ -28,6 +29,7 @@ const sections = [
 ] as const;
 
 const SettingsPage = () => {
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] =
     useState<(typeof sections)[number]>("profile");
   const navigate = useNavigate();
@@ -202,7 +204,12 @@ const SettingsPage = () => {
                     <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                       theme
                     </Label>
-                    <Select defaultValue="dark">
+                    <Select
+                      value={theme || "dark"}
+                      onValueChange={(value) =>
+                        setTheme(value as "dark" | "light" | "system")
+                      }
+                    >
                       <SelectTrigger className="w-48 bg-surface border-border">
                         <SelectValue />
                       </SelectTrigger>

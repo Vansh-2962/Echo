@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import got, { type Method } from "got";
 import { prisma } from "../lib/prisma.js";
 import type { AuthType, BodyType } from "../../generated/prisma/enums.js";
+import { calculateCredits } from "../helpers/calculateCredits.js";
 
 const methods: Record<string, string> = {
   GET: "get",
@@ -250,6 +251,8 @@ export async function createRequest(req: Request, res: Response) {
         },
       },
     };
+
+    // calculating the credit
 
     return res.status(200).json({ success: true, result });
   } catch (error) {
