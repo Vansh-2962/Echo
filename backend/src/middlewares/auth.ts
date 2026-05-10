@@ -19,14 +19,14 @@ export async function isAuth(req: Request, res: Response, next: NextFunction) {
       },
     });
 
-    const planObject = {
-      plan: plan?.name,
-      planId: plan?.id,
+    req.user = {
+      ...session.user,
+      ...(plan && {
+        plan: plan.name,
+        planId: plan.id,
+      }),
     };
-
-    req.user = { ...session.user, ...planObject };
     next();
-    
   } catch (error) {
     return res.status(500).json({ msg: "Error, Failed to check auth" });
   }

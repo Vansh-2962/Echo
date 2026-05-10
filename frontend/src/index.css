@@ -8,6 +8,14 @@ pre[class*="language-"],
 code[class*="language-"] {
   background: #f7f7f7 !important;
 }
+.monaco-editor.focused {
+  outline: none !important;
+}
+
+.line-numbers .line-numbers-rows {
+  border-right: none !important;
+  color: #6b7280;
+}
 
 .dark pre[class*="language-"],
 .dark code[class*="language-"] {

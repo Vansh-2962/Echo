@@ -16,9 +16,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { useTheme } from "next-themes";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useRequestStore } from "@/store/use-request-store";
+
+const fonts = [
+  "Fira Code, monospace",
+  "JetBrains Mono, monospace",
+  "Source Code Pro, monospace",
+  "Menlo, monospace",
+  "Ubuntu Mono, monospace",
+  "Consolas, monospace",
+  "Courier New, monospace",
+  "Monaco, monospace",
+];
 
 const sections = [
   "profile",
@@ -29,11 +41,20 @@ const sections = [
 ] as const;
 
 const SettingsPage = () => {
-  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] =
     useState<(typeof sections)[number]>("profile");
   const navigate = useNavigate();
   const { data } = authClient.useSession();
+  const {
+    setFontSize,
+    fontSize,
+    fontFamily,
+    setFontFamily,
+    lineNumber,
+    setLineNumber,
+    minimap,
+    setMinimap,
+  } = useRequestStore();
 
   const handleLogout = () => {
     authClient.signOut();
@@ -200,31 +221,20 @@ const SettingsPage = () => {
               <>
                 <h2 className="text-sm font-semibold mb-4">Appearance</h2>
                 <div className="space-y-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-col">
                     <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                       theme
                     </Label>
-                    <Select
-                      value={theme || "dark"}
-                      onValueChange={(value) =>
-                        setTheme(value as "dark" | "light" | "system")
-                      }
-                    >
-                      <SelectTrigger className="w-48 bg-surface border-border">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dark">Dark</SelectItem>
-                        <SelectItem value="light">Light</SelectItem>
-                        <SelectItem value="system">System</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <ThemeToggle settings={true} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                       font size
                     </Label>
-                    <Select defaultValue="14">
+                    <Select
+                      value={String(fontSize)}
+                      onValueChange={(val) => setFontSize(+val)}
+                    >
                       <SelectTrigger className="w-48 bg-surface border-border">
                         <SelectValue />
                       </SelectTrigger>
@@ -232,23 +242,61 @@ const SettingsPage = () => {
                         <SelectItem value="12">12px</SelectItem>
                         <SelectItem value="14">14px</SelectItem>
                         <SelectItem value="16">16px</SelectItem>
+                        <SelectItem value="18">18px</SelectItem>
+                        <SelectItem value="20">20px</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                      editor theme
+                      Font family
                     </Label>
-                    <Select defaultValue="one-dark">
+                    <Select
+                      defaultValue="Fira Code, monospace"
+                      value={fonts.find((f) => f === fontFamily)}
+                      onValueChange={(val) => setFontFamily(val)}
+                    >
                       <SelectTrigger className="w-48 bg-surface border-border">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="one-dark">One Dark</SelectItem>
-                        <SelectItem value="dracula">Dracula</SelectItem>
-                        <SelectItem value="github-dark">GitHub Dark</SelectItem>
+                        {fonts.map((font) => (
+                          <SelectItem
+                            key={font}
+                            value={font}
+                            style={{ fontFamily: font }}
+                          >
+                            {font.split(",")[0]}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="py-2 flex items-center justify-between w-48">
+                    <Label
+                      htmlFor="line_number"
+                      className="text-xs uppercase tracking-wider text-muted-foreground"
+                    >
+                      Line numbers
+                    </Label>
+                    <Switch
+                      id="line_number"
+                      checked={lineNumber}
+                      onCheckedChange={(val) => setLineNumber(val)}
+                    />
+                  </div>
+                  <div className="py-2 flex items-center justify-between w-48">
+                    <Label
+                      htmlFor="minimap"
+                      className="text-xs uppercase tracking-wider text-muted-foreground"
+                    >
+                      Minimap
+                    </Label>
+                    <Switch
+                      id="minimap"
+                      checked={minimap}
+                      onCheckedChange={(val) => setMinimap(val)}
+                    />
                   </div>
                 </div>
               </>

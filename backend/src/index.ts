@@ -25,7 +25,7 @@ app.use(express.json());
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.get("/api/health", (_: any, res: Response) => {
-  res.status(200).json("OK");
+  res.status(200).json({ msg: "OK" });
 });
 
 app.use("/api/v1", proxyRoutes);

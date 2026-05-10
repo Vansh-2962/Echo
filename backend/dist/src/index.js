@@ -7,21 +7,24 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 app.set("trust proxy", 1);
-app.use(cors({
+const corsOptions = {
     origin: ["http://localhost:8080", "https://echo-fwq4.onrender.com"],
     credentials: true,
-}));
-const PORT = 3000;
-app.all("/api/auth/{*any}", toNodeHandler(auth));
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+app.options("/{*any}", cors(corsOptions));
 app.use(express.json());
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.get("/api/health", (_, res) => {
-    res.status(200).json("OK");
+    res.status(200).json({ msg: "OK" });
 });
 app.use("/api/v1", proxyRoutes);
 app.get("/", (req, res) => {
     res.json("Hello from TypeScript Node backend 🚀");
 });
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(3000, () => {
+    console.log(`Server running on http://localhost:3000`);
 });
 //# sourceMappingURL=index.js.map

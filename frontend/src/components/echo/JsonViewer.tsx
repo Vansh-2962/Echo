@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism-okaidia.css";
+import "prismjs/plugins/line-numbers/prism-line-numbers";
+import "prismjs/plugins/line-numbers/prism-line-numbers.css";
 
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,8 +42,8 @@ export const JsonViewer = ({ content }: { content: any }) => {
         )}
       </Button>
 
-      <pre className="p-4 text-xs overflow-auto max-h-[400px] rounded-lg ">
-        <code ref={codeRef} className="language-json">
+      <pre className="p-4 overflow-auto max-h-[400px] rounded-lg line-numbers">
+        <code ref={codeRef} className="language-json ">
           {formatted}
         </code>
       </pre>

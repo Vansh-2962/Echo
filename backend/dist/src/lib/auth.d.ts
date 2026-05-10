@@ -1,16 +1,16 @@
 export declare const auth: import("better-auth").Auth<{
-    baseURL: string | undefined;
+    baseURL: string;
     trustedOrigins: string[];
     advanced: {
-        crossSubdomainCookies: {
-            enabled: boolean;
-        };
         defaultCookieAttributes: {
             secure: true;
             httpOnly: true;
             sameSite: "none";
-            partitioned: true;
         };
+    };
+    useSecureCookies: boolean;
+    crossSubdomainCookies: {
+        enabled: boolean;
     };
     database: (options: import("better-auth").BetterAuthOptions) => import("better-auth").DBAdapter<import("better-auth").BetterAuthOptions>;
     socialProviders: {

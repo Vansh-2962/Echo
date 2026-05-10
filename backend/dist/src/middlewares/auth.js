@@ -1,4 +1,5 @@
 import { auth } from "../lib/auth.js";
+import { prisma } from "../lib/prisma.js";
 export async function isAuth(req, res, next) {
     try {
         const session = await auth.api.getSession({
@@ -7,7 +8,19 @@ export async function isAuth(req, res, next) {
         if (!session) {
             return res.status(401).json({ msg: "Unauthorized" });
         }
-        req.user = session.user;
+        // fetch the current plan of the user and add it to the req.user object
+        const plan = await prisma.plan.findFirst({
+            where: {
+                userId: session.user.id,
+            },
+        });
+        req.user = {
+            ...session.user,
+            ...(plan && {
+                plan: plan.name,
+                planId: plan.id,
+            }),
+        };
         next();
     }
     catch (error) {

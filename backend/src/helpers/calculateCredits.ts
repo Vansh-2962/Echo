@@ -16,6 +16,7 @@ const planConfig = {
     historyPeriod: Infinity,
     auth: "all",
     envs: true,
+    communitySupport: true,
     requestScripts: true,
     prioritySupport: true,
   },

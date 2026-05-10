@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { KeyValueTable } from "./KeyValueTable";
 import { AuthPanel } from "./AuthPanel";
 import { useRequestStore } from "@/store/use-request-store";
+import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -16,14 +17,31 @@ import Editor from "@monaco-editor/react";
 const configTabs = ["params", "headers", "body", "auth", "scripts"] as const;
 
 export const RequestConfigTabs = () => {
+  const [showZoomHint, setShowZoomHint] = useState(true);
   const [activeConfigTab, setActiveConfigTab] =
     useState<(typeof configTabs)[number]>("params");
   const [scriptTab, setScriptTab] = useState<"pre" | "post">("pre");
-  const { tabs, activeTabId, updateTab } = useRequestStore();
+  const {
+    tabs,
+    activeTabId,
+    updateTab,
+    fontSize,
+    fontFamily,
+    lineNumber,
+    minimap,
+  } = useRequestStore();
   const tab = tabs.find((t) => t.id === activeTabId);
   if (!tab) return null;
 
   const editorRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowZoomHint(false);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleFormat = () => {
     editorRef.current?.getAction("editor.action.formatDocument").run();
@@ -107,13 +125,45 @@ export const RequestConfigTabs = () => {
             )}
             {tab.bodyType === "json" && (
               <div>
+                {showZoomHint && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10 rounded-lg transition-opacity animate-fade-in">
+                    <div className="flex flex-col items-center gap-3 text-center text-white">
+                      {/* Mouse Icon */}
+                      <video
+                        width={60}
+                        src="/Mouse-Scroll-Icon.webm"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      ></video>
+
+                      {/* Text */}
+                      <p className="text-sm font-medium flex items-center gap-1">
+                        Hold <Kbd>Ctrl</Kbd> + <Kbd>Scroll</Kbd> to Zoom
+                      </p>
+                      <button
+                        onClick={() => setShowZoomHint(false)}
+                        className="text-xs my-4 border px-2 py-1 rounded-lg hover:bg-white/20 transition-colors"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <Editor
+                  className="monaco-editor"
                   height="300px"
                   defaultLanguage="json"
                   theme="vs-dark"
                   value={tab.bodyContent}
                   options={{
-                    minimap: { enabled: false },
+                    minimap: { enabled: minimap },
+                    fontSize: fontSize ?? 16,
+                    fontFamily: fontFamily,
+                    automaticLayout: true,
+                    lineNumbers: lineNumber ? "on" : "off",
+                    mouseWheelZoom: true,
                   }}
                   onChange={(value) =>
                     updateTab(tab.id, { bodyContent: value || "" })

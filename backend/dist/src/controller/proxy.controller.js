@@ -1,5 +1,6 @@
 import got, {} from "got";
 import { prisma } from "../lib/prisma.js";
+import { calculateCredits } from "../helpers/calculateCredits.js";
 const methods = {
     GET: "get",
     POST: "post",
@@ -217,6 +218,7 @@ export async function createRequest(req, res) {
                 },
             },
         };
+        // calculating the credit
         return res.status(200).json({ success: true, result });
     }
     catch (error) {

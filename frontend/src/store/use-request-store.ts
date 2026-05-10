@@ -161,7 +161,15 @@ interface RequestStore {
   sidebarOpen: boolean;
   sidebarTab: "collections" | "history";
   upgradeModal: { open: boolean; limitType: "collections" | "requests" };
+  fontSize: number;
+  fontFamily: string;
+  lineNumber: boolean;
+  minimap: boolean;
 
+  setFontSize: (size: number) => void;
+  setFontFamily: (font: string) => void;
+  setLineNumber: (val: boolean) => void;
+  setMinimap: (val: boolean) => void;
   addTab: () => void;
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
@@ -211,6 +219,18 @@ export const useRequestStore = create<RequestStore>((set, get) => ({
   activeTabId: initialTab.id,
   upgradeModal: { open: false, limitType: "collections" as const },
   collections: [],
+
+  fontSize: 12,
+  setFontSize: (size: number) => set({ fontSize: size }),
+
+  fontFamily: "Fira Code, monospace",
+  setFontFamily: (font: string) => set({ fontFamily: font }),
+
+  lineNumber: false,
+  setLineNumber: (val: boolean) => set({ lineNumber: val }),
+
+  minimap: false,
+  setMinimap: (val: boolean) => set({ minimap: val }),
 
   history: [
     {
